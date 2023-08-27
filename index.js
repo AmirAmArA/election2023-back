@@ -20,7 +20,7 @@ app.use("/api/history", history);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
-});
+}).keepAliveTimeout = 61 * 1000
 
 const cron = require("node-cron");
 
