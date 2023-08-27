@@ -12,6 +12,10 @@ const votes = require("./controllers/vote");
 const citys = require("./controllers/citys");
 const history = require("./controllers/historydata");
 
+app.use((req, res, next) => {
+  console.log(req.path, req.method);
+  next();
+});
 
 app.use("/api/candidate", candidates);
 app.use("/api/adds", adds);
