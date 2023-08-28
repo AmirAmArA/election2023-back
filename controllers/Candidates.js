@@ -20,9 +20,22 @@ router.get("/:city", (req, res) => {
 });
 
 app.get('/test', async function(req, res){
+  console.log('1')
+  console.log(db)
 const promise= db.promise()
+    console.log('11')
+
+console.log(promise)
 var sql = "SELECT * FROM candidates"
+try {
 const [rows,field] = await promise.execute(sql)
+  
+  console.log('1111')
+  console.log(rows,field)
+} catch(e){
+console.error(e)
+}
+console.log('111')
 
 res.send(rows)
  });
