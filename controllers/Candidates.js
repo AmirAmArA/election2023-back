@@ -22,7 +22,7 @@ router.get("/:city", (req, res) => {
 app.get('/test', async function(req, res){
 const promise= db.promise()
 var sql = "SELECT * FROM candidates"
-const [rows,field] = awiat promise.execute(sql)
+const [rows,field] = await promise.execute(sql)
 
 res.send(rows)
  });
