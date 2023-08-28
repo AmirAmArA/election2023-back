@@ -14,7 +14,7 @@ app.use(cors());
 
 router.get('/', (req, res) => {
     const userAgent = req.headers['user-agent'];
-    const clientIP = req.ip;
+    const clientIP = req.headers['x-forwarded-for'] || req.ip;
     console.log(clientIP)
     res.json({
       userAgent: userAgent,
