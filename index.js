@@ -5,6 +5,7 @@ const cors = require("cors"); // Import the cors package
 require('dotenv').config()
 
 app.use(cors());
+app.set('trust proxy', true);
 
 const candidates = require("./controllers/Candidates");
 const adds = require("./controllers/adds");
