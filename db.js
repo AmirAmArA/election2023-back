@@ -6,12 +6,11 @@ const db = mysql.createPool({
   password: process.env.password,
   database: process.env.database,
   charset: "utf8mb4",
-  connectionLimit: 10 // Adjust as needed
+  waitForConnections: true,
+connectionLimit: 10,
+queueLimit: 0
 });
 
-db.on('acquire', function (connection) {
-  console.log('Connection %d acquired', connection.threadId);
-});
 
 module.exports = db;
 
