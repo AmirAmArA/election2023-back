@@ -20,6 +20,7 @@ router.get("/:city", (req, res) => {
 });
 
 app.get('/test', async function(req, res){
+  console.log(process.env.username)
   console.log('1')
   console.log(db)
 const promise= db.promise()
