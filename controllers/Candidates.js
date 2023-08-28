@@ -20,11 +20,13 @@ router.get("/:city", (req, res) => {
 });
 
 router.get("/", (req, res) => {
-  const q = "SELECT * FROM candidates";
-  db.query(q, (err, data) => {
-    if (err) return res.json(err);
-    return res.json(data);
-  });
+  const test = "hello test";
+  // const q = "SELECT * FROM candidates";
+  // db.query(q, (err, data) => {
+  //   if (err) return res.json(err);
+  //   return res.json(data);
+  // });
+  return res.status(200).json(test);
 });
 
 router.post("/addCandidates", (req, res) => {
