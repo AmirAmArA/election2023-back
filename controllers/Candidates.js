@@ -42,13 +42,11 @@ res.send(rows)
  });
 
 router.get("/", (req, res) => {
-  const test = "hello test";
-  // const q = "SELECT * FROM candidates";
-  // db.query(q, (err, data) => {
-  //   if (err) return res.json(err);
-  //   return res.json(data);
-  // });
-  return res.status(200).json(test);
+  const q = "SELECT * FROM candidates";
+  db.query(q, (err, data) => {
+    if (err) return res.json(err);
+    return res.json(data);
+  });
 });
 
 router.post("/addCandidates", (req, res) => {
