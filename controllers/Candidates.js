@@ -19,6 +19,25 @@ router.get("/:city", (req, res) => {
   });
 });
 
+app.get('/data', async (req, res) => {
+  try {
+    // Get a connection from the po
+    const connection = await pool.getConnection();
+
+    // Execute a query
+    const [rows, fields] = await connection.query('SELECT * FROM candidates');
+
+    // Release the connection back to the pool
+    connection.release();
+
+    // Send the query results as a JSON response
+    res.json(rows);
+  } catch (error) {
+    console.error('Error querying the database:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 router.get("/", (req, res) => {
   const test = "hello test";
   // const q = "SELECT * FROM candidates";
