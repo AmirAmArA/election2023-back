@@ -9,7 +9,10 @@ const db = mysql.createPool({
   charset: "utf8mb4",
   waitForConnections: true,
 connectionLimit: 10,
-queueLimit: 0
+queueLimit: 0,
+   ssl: {
+    ca: fs.readFileSync(__dirname + '/ca-certificate.crt') // Adjust the path accordingly
+  }
 });
 
 
