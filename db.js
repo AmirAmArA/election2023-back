@@ -3,7 +3,7 @@ const fs = require('fs');
 
 console.log('Config:', {
   host: process.env.host,
-  user: process.env.username,
+  user: process.env.user,
   password: process.env.password,
   database: process.env.database,
   port: process.env.port
@@ -11,7 +11,7 @@ console.log('Config:', {
 
 const db = mysql.createPool({
   host: process.env.host,
-  user: process.env.username,
+  user: process.env.user,
   password: process.env.password,
   database: process.env.database,
   port: process.env.port,
