@@ -6,6 +6,23 @@ router.use(bodyParser.json());
 const  db  = require('../db');
 const cron = require('node-cron');
 
+router.get('/by-date-and-city', (req, res) => {
+    const date = req.query.date; // e.g. "2023-07-20"
+    const cityName = req.query.city;
+
+    if(!date || !cityName) {
+        return res.status(400).json({ message: "Please provide both date and city name in the query parameters." });
+    }
+
+    const q = "SELECT * FROM historydata WHERE datedata = ? AND candidatecity = ?";
+    db.query(q, [date, cityName], (err, data) => {
+        if (err) {
+            return res.json(err);
+        }
+        return res.json(data);
+    });
+});
+
 cron.schedule('7 0 * * *', () => {
   const insertQuery = 'INSERT INTO historydata (candidatesid, candidatesname, candidatesvotes, datedata, candidatecity) VALUES (?, ?, ?, ?, ?)';
   const q = "SELECT * FROM candidates";
