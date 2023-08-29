@@ -29,7 +29,7 @@ router.get("/:addtype", (req, res) => {
 });
 
 router.get("/addcity", (req, res) => {
-  const addcity = req.body.city; // Get the add type from the URL parameter
+  const addcity = req.body.addcity; // Get the add type from the URL parameter
 
   const q = "SELECT * FROM adds WHERE addcity = ?";
 
@@ -42,8 +42,8 @@ router.get("/addcity", (req, res) => {
 });
 
 router.post("/addadd", (req, res) => {
-  const q = "INSERT INTO adds (`addtype`,`addimg`,`addtime`) VALUES (?, ? ,?)";
-  const values = [req.body.addtype, req.body.addimg, req.body.addtime];
+  const q = "INSERT INTO adds (`addtype`,`addimg`,`addtime`, `addcity`) VALUES (?, ? ,?,?)";
+  const values = [req.body.addtype, req.body.addimg, req.body.addtime, req.body.addcity];
   db.query(q, values, (err, data) => {
     if (err) return res.json(err);
     return res.json("success");
