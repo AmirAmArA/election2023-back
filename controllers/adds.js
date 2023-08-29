@@ -52,8 +52,8 @@ router.post("/addadd", (req, res) => {
 
 router.put("/:add_id", (req, res) => {
   const addId = req.params.add_id;
-  const values = [req.body.addtype, req.body.addimg, addId];
-  const updateQuery = "UPDATE adds SET addtype = ?, addimg = ? WHERE idadd = ?";
+  const values = [req.body.addtype,req,body.addcity, req.body.addimg, addId];
+  const updateQuery = "UPDATE adds SET addtype = ?,addcity=?, addimg = ? WHERE idadd = ?";
 
   db.query(updateQuery, values, (err, result) => {
     if (err) {
