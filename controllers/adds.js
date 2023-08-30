@@ -1,4 +1,5 @@
 const express = require("express");
+const { s3, upload } = require("../imagesBucket")
 const router = express.Router();
 const bodyParser = require("body-parser");
 const cors = require("cors");
@@ -6,6 +7,8 @@ router.use(bodyParser.json());
 const db = require("../db");
 const app = express();
 app.use(cors());
+
+
 
 router.get("/", (req, res) => {
   const q = "SELECT * FROM adds";
@@ -41,18 +44,38 @@ router.get("/addcity", (req, res) => {
   });
 });
 
-router.post("/addadd", (req, res) => {
-  const q = "INSERT INTO adds (`addtype`,`addimg`,`addtime`, `addcity`) VALUES (?, ? ,?,?)";
-  const values = [req.body.addtype, req.body.addimg, req.body.addtime, req.body.addcity];
-  db.query(q, values, (err, data) => {
-    if (err) return res.json(err);
-    return res.json("success");
-  });
+router.post("/addadd", upload.single('image'), async (req, res) => {
+  const file = req.file;
+
+  const params = {
+    Bucket: 'election23',
+    Key: Date.now() + file.originalname,
+    Body: file.buffer, // this could be a stream, buffer, etc.
+    ACL: 'public-read'   // if you want the image to be publicly accessible
+  };
+
+  try {
+    await s3.putObject(params).promise();
+
+    const imageUrl = `https://${spacesEndpoint}/${params.Bucket}/${params.Key}`;
+    // Store imageUrl in your MySQL database...
+
+    const q = "INSERT INTO adds (`addtype`,`addimg`,`addtime`, `addcity`) VALUES (?, ? ,?,?)";
+    const values = [req.body.addtype, imageUrl, req.body.addtime, req.body.addcity];
+    db.query(q, values, (err, data) => {
+      if (err) return res.json(err);
+      return res.json({ success: true, imageUrl });
+
+    });
+
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 });
 
 router.put("/:add_id", (req, res) => {
   const addId = req.params.add_id;
-  const values = [req.body.addtype,req,body.addcity, req.body.addimg, addId];
+  const values = [req.body.addtype, req.body.addcity, req.body.addimg, addId];
   const updateQuery = "UPDATE adds SET addtype = ?,addcity=?, addimg = ? WHERE idadd = ?";
 
   db.query(updateQuery, values, (err, result) => {
