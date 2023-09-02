@@ -8,7 +8,6 @@ const db = require("../db");
 const app = express();
 app.use(cors());
 
-const spacesEndpoint = 'https://election23.fra1.digitaloceanspaces.com';
 
 router.get("/", (req, res) => {
   const q = "SELECT * FROM adds";
@@ -57,7 +56,7 @@ router.post("/addadd", upload.single('image'), async (req, res) => {
   try {
     await s3.putObject(params).promise();
 
-    const imageUrl = `https://${spacesEndpoint}/${params.Bucket}/${params.Key}`;
+    const imageUrl = `${spacesEndpoint}/${params.Bucket}/${params.Key}`;
     // Store imageUrl in your MySQL database...
 
     const q = "INSERT INTO adds (`addtype`,`addimg`,`addtime`, `addcity`) VALUES (?, ? ,?,?)";
