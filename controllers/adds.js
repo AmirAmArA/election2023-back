@@ -57,7 +57,7 @@ router.post("/addadd", upload.single('image'), async (req, res) => {
   try {
     await s3.putObject(params).promise();
 
-    const imageUrl = `${spacesEndpoint}/${params.Bucket}/${params.Key}`;
+    const imageUrl = `${spacesEndpoint}/ads/${params.Key}`;
     // Store imageUrl in your MySQL database...
     const currentTimestamp = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
