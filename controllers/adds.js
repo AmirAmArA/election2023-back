@@ -8,6 +8,7 @@ const db = require("../db");
 const app = express();
 app.use(cors());
 
+const spacesEndpoint = 'https://election23.fra1.digitaloceanspaces.com';
 
 router.get("/", (req, res) => {
   const q = "SELECT * FROM adds";
