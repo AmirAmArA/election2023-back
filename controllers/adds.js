@@ -59,9 +59,10 @@ router.post("/addadd", upload.single('image'), async (req, res) => {
 
     const imageUrl = `${spacesEndpoint}/${params.Bucket}/${params.Key}`;
     // Store imageUrl in your MySQL database...
+    const currentTimestamp = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
     const q = "INSERT INTO adds (`addtype`,`addimg`,`addtime`, `addcity`) VALUES (?, ? ,?,?)";
-    const values = [req.body.addtype, imageUrl, req.body.addtime, req.body.addcity];
+    const values = [req.body.addtype, imageUrl, currentTimestamp, req.body.addcity];
     db.query(q, values, (err, data) => {
       if (err) return res.json(err);
       return res.json({ success: true, imageUrl });
