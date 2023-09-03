@@ -31,7 +31,7 @@ router.get("/:addtype", (req, res) => {
   });
 });
 
-router.get("/addcity", (req, res) => {
+router.post("/addcity", (req, res) => {
   const addcity = req.body.addcity; // Get the add type from the URL parameter
 
   const q = "SELECT * FROM adds WHERE addcity = ?";
