@@ -5,6 +5,8 @@ const cors = require("cors");
 router.use(bodyParser.json());
 const db = require("../db");
 const app = express();
+const ip = require('ip'); // Import the 'ip' library
+
 
 app.use(cors());
 
@@ -73,6 +75,22 @@ router.post("/addCandidates", (req, res) => {
 
 router.put("/:id", (req, res) => {
   const candidateId = req.params.id;
+
+  const userAgent = req.headers['user-agent'];
+  const clientIP = ip.address();
+
+  // Check if the user has voted before
+  const checkQuery = 'SELECT * FROM votes WHERE userAgent = ? OR clientip = ?';
+  db.query(checkQuery, [userAgent, clientIP], (err, results) => {
+    if (err) {
+      return res.json(err);
+    }
+
+    if (results.length > 0) {
+      return res.json(results);
+    }
+
+  if(results.length == 0){
   const updateQuery = "UPDATE candidates SET votes = votes + 1 WHERE id = ?";
   db.query(updateQuery, [candidateId], (err, result) => {
     if (err) {
@@ -80,6 +98,8 @@ router.put("/:id", (req, res) => {
     }
     return res.json({ message: "Votes incremented successfully" });
   });
+}
+})
 });
 
 router.delete("/:id", (req, res) => {
