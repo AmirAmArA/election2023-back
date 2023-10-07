@@ -103,7 +103,7 @@ router.put("/:id", (req, res) => {
     if (err) {
       return res.json(err);
     }
-    db.query(userAgentQuery,[candidateId, userAgent, clientIP,1], ( err,result) => {
+    db.query(userAgentQuery,[candidateId, userAgent, clientIP,true], ( err,result) => {
       if (err) {
         return res.json(err);
       }
