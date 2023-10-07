@@ -103,7 +103,9 @@ router.put("/:id", (req, res) => {
     if (err) {
       return res.json(err);
     }
-    db.query(userAgentQuery,[candidateId, userAgent, clientIP,true], ( err,result) => {
+    const userAgentString = userAgent.toString();
+    const clientIPString = clientIP.toString();
+    db.query(userAgentQuery,[candidateId, userAgentString, clientIPString,true], ( err,result) => {
       if (err) {
         return res.json(err);
       }
