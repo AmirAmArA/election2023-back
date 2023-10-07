@@ -74,55 +74,48 @@ router.post("/addCandidates", (req, res) => {
 });
 
 router.put("/:id", (req, res) => {
-    const candidateId = req.params.id;
-    const userAgent = req.headers['user-agent'];
-    const clientIP = ip.address();
+  
+  const candidateId = req.params.id;
 
-    const checkQuery = 'SELECT * FROM votes WHERE userAgent = ? AND clientip = ?';
-    const updateQuery = "UPDATE candidates SET votes = votes + 1 WHERE id = ?";
-    const userAgentQuery = "INSERT INTO votes (candidate_id, userAgent, clientip, isvote) VALUES (?,?,?,?)";
+  const userAgent = req.headers['user-agent'];
+  const clientIP = ip.address();
 
-    db.beginTransaction((err) => {
-        if (err) return res.json({error: err.message});
-        
-        db.query(checkQuery, [userAgent, clientIP], (err, results) => {
-            if (err) {
-                return db.rollback(() => {
-                    res.json({error: err.message});
-                });
-            }
+  console.log(`candidate id: ${candidateId}, user agent:${userAgent},  IP =${clientIP}`)
+  // Check if the user has voted before
+  
+  //Queries
+  const checkQuery = 'SELECT * FROM votes WHERE userAgent = ? AND clientip = ?';
+  const updateQuery = "UPDATE candidates SET votes = votes + 1 WHERE id = ?";
+  const userAgentQuery = "INSERT INTO votes ('candidate_id', 'userAgent', 'clientip', 'isvote') VALUES (?,?,?,?)";
 
-            if (results.length > 0) {
-                return res.json({message: "the user agent already voted"});
-            }
+  db.query(checkQuery, [userAgent, clientIP], (err, results) => {
+    if (err) {
+      return res.json(err);
+    }
 
-            if(results.length == 0){
-                db.query(updateQuery, [candidateId], (err, result) => {
-                    if (err) {
-                        return db.rollback(() => {
-                            res.json({error: err.message});
-                        });
-                    }
-                    db.query(userAgentQuery,[candidateId, userAgent, clientIP,1], (err, result) => {
-                        if (err) {
-                            return db.rollback(() => {
-                                res.json({error: err.message});
-                            });
-                        }
-                        db.commit((err) => {
-                            if (err) {
-                                return db.rollback(() => {
-                                    res.json({error: err.message});
-                                });
-                            }
-                            return res.json({message: "Votes incremented successfully"});
-                        });
-                    });
-                });
-            }
-        });
-    });
+    if (results.length > 0) {
+      return res.json({message: "the user agent already voted"});
+    }
+
+  if(results.length == 0){
+
+  db.query(updateQuery, [candidateId], (err, result) => {
+    if (err) {
+      return res.json(err);
+    }
+    db.query(userAgentQuery,[candidateId, userAgent, clientIP,1], ( err,result) => {
+      if (err) {
+        return res.json(err);
+      }
+    })
+
+    return res.json({message: "Votes incremented successfully"})
+  });
+
+}
+})
 });
+
 
 router.delete("/:id", (req, res) => {
   const candidateId = req.params.id;
