@@ -73,6 +73,9 @@ router.post("/addCandidates", (req, res) => {
   });
 });
 
+const mysql = require('mysql2');
+const pool = mysql.createPool({/* your db config */});
+
 router.put("/:id", (req, res) => {
     const candidateId = req.params.id;
     const userAgent = req.headers['user-agent'];
@@ -82,48 +85,50 @@ router.put("/:id", (req, res) => {
     const updateQuery = "UPDATE candidates SET votes = votes + 1 WHERE id = ?";
     const userAgentQuery = "INSERT INTO votes (candidate_id, userAgent, clientip, isvote) VALUES (?,?,?,?)";
 
-    db.beginTransaction((err) => {
-        if (err) return res.json({error: err.message});
-        
-        db.query(checkQuery, [userAgent, clientIP], (err, results) => {
-            if (err) {
-                return db.rollback(() => {
-                    res.json({error: err.message});
-                });
-            }
+    pool.getConnection((err, connection) => {
+        if(err) return res.json({error: err.message});
 
-            if (results.length > 0) {
-                return res.json({message: "the user agent already voted"});
+        connection.beginTransaction(err => {
+            if(err) {
+                connection.release();
+                return res.json({error: err.message});
             }
+            
+            connection.query(checkQuery, [userAgent, clientIP], (err, results) => {
+                if(err) return rollback(connection, res, err);
 
-            if(results.length == 0){
-                db.query(updateQuery, [candidateId], (err, result) => {
-                    if (err) {
-                        return db.rollback(() => {
-                            res.json({error: err.message});
-                        });
-                    }
-                    db.query(userAgentQuery,[candidateId, userAgent, clientIP,1], (err, result) => {
-                        if (err) {
-                            return db.rollback(() => {
-                                res.json({error: err.message});
+                if(results.length > 0) {
+                    connection.release();
+                    return res.json({message: "the user agent already voted"});
+                }
+
+                if(results.length == 0) {
+                    connection.query(updateQuery, [candidateId], (err, result) => {
+                        if(err) return rollback(connection, res, err);
+
+                        connection.query(userAgentQuery, [candidateId, userAgent, clientIP, 1], (err, result) => {
+                            if(err) return rollback(connection, res, err);
+
+                            connection.commit(err => {
+                                if(err) return rollback(connection, res, err);
+
+                                connection.release();
+                                return res.json({message: "Votes incremented successfully"});
                             });
-                        }
-                        db.commit((err) => {
-                            if (err) {
-                                return db.rollback(() => {
-                                    res.json({error: err.message});
-                                });
-                            }
-                            return res.json({message: "Votes incremented successfully"});
                         });
                     });
-                });
-            }
+                }
+            });
         });
     });
 });
 
+function rollback(connection, res, err) {
+    connection.rollback(() => {
+        connection.release();
+        res.json({error: err.message});
+    });
+}
 
 router.delete("/:id", (req, res) => {
   const candidateId = req.params.id;
