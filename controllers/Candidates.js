@@ -80,24 +80,36 @@ router.put("/:id", (req, res) => {
   const clientIP = ip.address();
 
   // Check if the user has voted before
-  const checkQuery = 'SELECT * FROM votes WHERE userAgent = ? OR clientip = ?';
+  
+  //Queries
+  const checkQuery = 'SELECT * FROM votes WHERE userAgent = ? AND clientip = ?';
+  const updateQuery = "UPDATE candidates SET votes = votes + 1 WHERE id = ?";
+  const userAgentQuery = "UPDATE votes SET candidate_id = ? AND userAgent = ? AND clientip = ? AND isvote = 1";
+
   db.query(checkQuery, [userAgent, clientIP], (err, results) => {
     if (err) {
       return res.json(err);
     }
 
     if (results.length > 0) {
-      return res.json(results);
+      return res.json({message: "the user agent already voted"});
     }
 
   if(results.length == 0){
-  const updateQuery = "UPDATE candidates SET votes = votes + 1 WHERE id = ?";
+
   db.query(updateQuery, [candidateId], (err, result) => {
     if (err) {
       return res.json(err);
     }
-    return res.json({ message: "Votes incremented successfully" });
+    db.query(userAgentQuery,[candidateId, userAgent, clientIP], ( err,result) => {
+      if (err) {
+        return res.json(err);
+      }
+    })
+
+    return res.json({message: "Votes incremented successfully"})
   });
+
 }
 })
 });
