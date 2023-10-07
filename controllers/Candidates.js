@@ -84,7 +84,7 @@ router.put("/:id", (req, res) => {
   //Queries
   const checkQuery = 'SELECT * FROM votes WHERE userAgent = ? AND clientip = ?';
   const updateQuery = "UPDATE candidates SET votes = votes + 1 WHERE id = ?";
-  const userAgentQuery = "UPDATE votes SET candidate_id = ? AND userAgent = ? AND clientip = ? AND isvote = 1";
+  const userAgentQuery = "INSERT INTO votes ('candidate_id', 'userAgent', 'clientip', 'isvote') VALUES (?,?,?,1)";
 
   db.query(checkQuery, [userAgent, clientIP], (err, results) => {
     if (err) {
