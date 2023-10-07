@@ -24,7 +24,8 @@ router.post('/by-date-and-city', (req, res) => {
 });
 
 
-cron.schedule('35 20 * * *', () => {
+cron.schedule('37 17 * * *', () => {
+    console.log('cron job started')
   const insertQuery = 'INSERT INTO historydata (candidatesid, candidatesname, candidatesvotes, datedata, candidatecity) VALUES (?, ?, ?, ?, ?)';
   const q = "SELECT * FROM candidates";
 
