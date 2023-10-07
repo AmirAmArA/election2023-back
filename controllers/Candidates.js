@@ -105,9 +105,10 @@ router.put("/:id", (req, res) => {
       if (err) {
         return res.json(err);
       }
+          return res.json({message: "Votes incremented successfully"})
+
     })
 
-    return res.json({message: "Votes incremented successfully"})
   });
 
 }
