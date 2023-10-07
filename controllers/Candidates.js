@@ -74,46 +74,40 @@ router.post("/addCandidates", (req, res) => {
 });
 
 router.put("/:id", (req, res) => {
-  const candidateId = req.params.id;
+    const candidateId = req.params.id;
+    const userAgent = req.headers['user-agent'];
+    const clientIP = ip.address();
 
-  const userAgent = req.headers['user-agent'];
-  const clientIP = ip.address();
+    // Check if the user has voted before
+    const checkQuery = 'SELECT * FROM votes WHERE userAgent = ? AND clientip = ?';
+    const updateQuery = "UPDATE candidates SET votes = votes + 1 WHERE id = ?";
+    const userAgentQuery = "INSERT INTO votes ('candidate_id', 'userAgent', 'clientip', 'isvote') VALUES (?,?,?,?)";
 
-  // Check if the user has voted before
-  
-  //Queries
-  const checkQuery = 'SELECT * FROM votes WHERE userAgent = ? AND clientip = ?';
-  const updateQuery = "UPDATE candidates SET votes = votes + 1 WHERE id = ?";
-  const userAgentQuery = "INSERT INTO votes ('candidate_id', 'userAgent', 'clientip', 'isvote') VALUES (?,?,?,?)";
+    db.query(checkQuery, [userAgent, clientIP], (err, results) => {
+        if (err) {
+            return res.json(err);
+        }
 
-  db.query(checkQuery, [userAgent, clientIP], (err, results) => {
-    if (err) {
-      return res.json(err);
-    }
+        if (results.length > 0) {
+            return res.json({message: "the user agent already voted"});
+        }
 
-    if (results.length > 0) {
-      return res.json({message: "the user agent already voted"});
-    }
-
-  if(results.length == 0){
-
-  db.query(updateQuery, [candidateId], (err, result) => {
-    if (err) {
-      return res.json(err);
-    }
-    db.query(userAgentQuery,[candidateId, userAgent, clientIP,1], ( err,result) => {
-      if (err) {
-        return res.json(err);
-      }
-          return res.json({message: "Votes incremented successfully"})
-
-    })
-
-  });
-
-}
-})
+        if(results.length == 0){
+            db.query(updateQuery, [candidateId], (err, result) => {
+                if (err) {
+                    return res.json(err);
+                }
+                db.query(userAgentQuery,[candidateId, userAgent, clientIP,1], (err, result) => {
+                    if (err) {
+                        return res.json(err);
+                    }
+                    return res.json({message: "Votes incremented successfully"});
+                });
+            });
+        }
+    });
 });
+
 
 router.delete("/:id", (req, res) => {
   const candidateId = req.params.id;
